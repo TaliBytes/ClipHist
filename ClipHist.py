@@ -10,6 +10,9 @@ import threading
 # number of items the clipboard is allowed to store
 maxClipboardItems = 20  
 
+# flag to track state of the hotkey
+hotKeyPressed = False
+
 
 
 class tClipboardManager:
@@ -87,21 +90,37 @@ def showHistory():
 
 
 
-def onCmdV():
-    showHistory()
-    return False    # intended to prevent default key action... doesn't seem to work
+# hotkey pressed
+def onPress(key):
+    global hotKeyPressed
+
+    try:
+        if key == keyboard.Key.cmd:
+            hotKeyPressed = True
+        elif hotKeyPressed and key == keyboard.KeyCode.from_char('v'):
+            showHistory()
+            return False
+    except AttributeError:
+        pass
 
 
 
-# assign listening keybinds
-def hotkeyListener():
-    with keyboard.GlobalHotKeys({
-        '<cmd>+v': onCmdV()
-    }) as hotkeys:
-        hotkeys.join()
+# hotkey released
+def onRelease(key):
+    global hotKeyPressed
+
+    if key == keyboard.Key.cmd:
+        hotKeyPressed = False
+
+
+
+# listen for key press and releases
+def hotKeyListener():
+    with keyboard.Listener(on_press=onPress, on_release=onRelease, suppress=True) as listener:
+        listener.join()
 
 
 
 # initialize everything
-threading.Thread(target=hotkeyListener, daemon=True).start()    # threaded separate to prevent interference with Gtk.main() loop
+threading.Thread(target=hotKeyListener, daemon=True).start()    # threaded separate to prevent interference with Gtk.main() loop
 Gtk.main()
