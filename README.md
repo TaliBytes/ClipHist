@@ -1,4 +1,4 @@
-# Linux Clipboard History Manager (Simple ClipHist)
+# Linux Clipboard History Manager (ClipHist)
 
 ## WARNING - APP IS STILL IN DEVELOPMENT AND NON FUNCTIONAL
 
@@ -8,7 +8,7 @@ To be straight-forward, I'm not satisfied with any of the existing clipboard man
 
 ## Features
 
-Simple ClipHist is my attempt at a simple clipboard manager for Linux. Here's what it should do:
+ClipHist is my attempt at a simple clipboard manager for Linux. Here's what it should do:
 
 1. Copying to the built-in clipboard (`ctrl+c`) should also store the item to ClipHist.
 2. Pasting from the built-in clipboard (`ctrl+v`) does not affect ClipHist's stored items (up to 20).
@@ -22,7 +22,7 @@ Simple ClipHist is my attempt at a simple clipboard manager for Linux. Here's wh
 
 ### Prerequisites
 
-Simple ClipHist is built using Python, gi.Gtk, gi.Gdk, pynput, and threading. Install the following dependancies:
+ClipHist is built using Python, gi.Gtk, gi.Gdk, pynput, and threading. Install the following dependancies:
 
 ```console
 sudo apt update && sudo apt upgrade -y
