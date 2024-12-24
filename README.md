@@ -2,9 +2,9 @@
 
 ## WARNING - APP IS STILL IN DEVELOPMENT AND NON FUNCTIONAL
 
-Linux is an open source OS with (typically) minimal bloat pre-installed. This has the obvious advantage of no bloat but has the disadvantage that features one may consider key are simply missing from the experience. Up until recently I used Windows and in my typical day-to-day work-flow (be it back when I was in school, today as a coder, or at various times I am word processing) I consistently use(d) the Windows "Clipboard History" utility that is built into Windows. Upon moving to Linux I discovered, not surprisingly, that such a feature is not built into the few distros I've tried up till now.
+Linux is an open source OS with (typically) minimal bloat pre-installed. This has the obvious advantage of no bloat but has the disadvantage that features one may consider key are simply missing from the experience. Up until recently, I've used Windows in my typical day-to-day work-flow (be it back when I was in school, today as a coder, or at various times I am word processing). I consistently used the Windows "Clipboard History" utility that is built into Windows. Upon moving to Linux I discovered that, not surprisingly, such a feature is not built into the few distros I've tried up till now.
 
-To be straight-forward, I'm not satisfied with any of the existing clipboard managers that have been created for Linux thus far. I find that they're too over-engineered, have built-in bloat, or similar issues. I need something super simple, much like the built in option for Windows.
+To be straight-forward, I'm not satisfied with any of the existing clipboard managers that have been created for Linux thus far. I find that they're too over-engineered, have what I consider to be built-in bloat, or they have other/similar issues. I need something quite simple, much like the built in option for Windows.
 
 ## Features
 
@@ -12,7 +12,7 @@ ClipHist is my attempt at a simple clipboard manager for Linux. Here's what it s
 
 1. Copying to the built-in clipboard (`ctrl+c`) should also store the item to ClipHist.
 2. Pasting from the built-in clipboard (`ctrl+v`) does not affect ClipHist's stored items (up to 20).
-3. ClipHist should open using `cmd+v` (aka `super+v`). Historically copied items are navigatable using arrows keys (and enter) or mouse. Selecting an item:
+3. A GUI should open using `cmd+v` (aka `super+v`). Historically copied items are navigatable using arrows keys (and enter) or mouse. Selecting an item:
     - Moves it to the "most recent" spot in ClipHist
     - Pastes it into the current selected field
     - "Copies" that item to the system's built-in clipboard
@@ -22,13 +22,15 @@ ClipHist is my attempt at a simple clipboard manager for Linux. Here's what it s
 
 ### Prerequisites
 
-ClipHist is built using Python, gi.Gtk, gi.Gdk, pynput, and threading. Install the following dependancies:
+ClipHist is built using Python and its pynput library. Install the following:
 
 ```console
 sudo apt update && sudo apt upgrade -y
-sudo apt install gir1.2-gtk-3.0 libgtk-3-dev
-sudo apt install python3 python3-threading python3-gi python3-gi-cairo
+sudo apt install python3 python3-pynput 
 ```
+<!-- libs no longer used -->
+<!-- sudo apt install gir1.2-gtk-3.0 libgtk-3-dev -->
+<!-- python3-threading python3-gi python3-gi-cairo -->
 
 ### Configure Service
 

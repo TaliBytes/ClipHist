@@ -1,126 +1,108 @@
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk
+"""
+ClipHist
 
+Written 12/23/24 by Talia Shaffer
+(github.com/TaliBytes/ClipHist)
+
+A simple clipboard history manager service for Linux
+"""
+
+
+# set your preferred configuration here:
+maxClipboardItems = 20
+
+
+
+
+
+"""  START OF PROGRAM  """
+
+import pyperclip
 from pynput import keyboard
-import threading
-
-
-
-# number of items the clipboard is allowed to store
-maxClipboardItems = 20  
-
-# flag to track state of the hotkey
-hotKeyPressed = False
-
 
 
 class tClipboardManager:
     def __init__(self):
-        # get clipboard object and create history array
-        self.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        # self.history stores all items
         self.history = []
 
-    # add and item only if it doesn't exist
-    def addToHistory(self, item):
-        if item not in self.history:
-            self.history.insert(0, item)
+    def addToSystemClipboard(self, item):
+        pyperclip.copy(item)
 
-            # when an item is added, check to see if too many stored items
+    def addToHistory(self, item):
+        if item in self.history:
+            # move item to top if it is already in history
+            self.history.remove(item)
+            self.history.insert(0, item)
+            self.addToSystemClipboard(item)
+            return
+
+        if item not in self.history:
+            # add to ClipHist
+            self.history.insert(0, item)        
+            self.addToSystemClipboard(item)
+
+            # remove oldest item if too many items
             if len(self.history) > maxClipboardItems:
                 self.history.pop()
+            return
 
-    # waits for text to be added to system clipboard, then adds it to history
-    def getFromHistory(self):
-        content = self.clipboard.wait_for_text()
-        if content:
-            self.addToHistory(content)
+    def popFromHistory(self, itemNo = 0):
+        # remove selected item or most recent item
+        self.history.pop(itemNo)
+        
+        # copy the new most recent item to system clipboard
+        # (just in case the previous item was the item removed from clipboard)
+        anItem = self.history[0]
+        self.addToSystemClipboard(anItem)
 
-    def setClipboardContent(self, item):
-        self.clipboard.set_text(item, -1)
-
-
-# new clipboard manager object
-clipboardManager = tClipboardManager
-
-
-
-class tClipboardHistoryGUI(Gtk.Window):
-    def __init__ (self, manager):
-        # create the window, link to clipboardManager
-        super().__init__(title='Clipboard History')
-        self.manager = clipboardManager
-        self.set_default_size(300,500)
-
-        self.listbox = Gtk.ListBox()
-        self.add(self.listbox)
-
-        # connect clise event to a function
-        self.connect('destroy', Gtk.main_quit)
-
-    def updateList(self):
-        # remove outdated/empty rows on update of list
-        self.listbox.foreach(lambda widget: self.listbox.remove(widget))
-
-        # list current history items
-        for item in self.manager.history:
-            row = Gtk.ListBoxRow()
-            label = Gtk.Label(label=item, xalign=0)
-            row.add(label)
-            self.listbox.add(row)
-        self.listbox.show_all()
-
-    def onRowActivated(self, listbox, row):
-        # copy selected item to system clipboard
-        item = row.get_child().get_label()
-        self.manager.setClipboardContent(item)
-        self.manager.addToHistory(item)
-        self.hide()
+clipboard = tClipboardManager()
 
 
 
-# show history GUI
-def showHistory():
-    # clipboard history GUI object
-    clipboardGUI = tClipboardHistoryGUI(clipboardManager)
+clipboard.addToHistory('goodnight')
+clipboard.addToHistory('sky!')
 
-    # open clipboard window and bring into focus
-    clipboardGUI.show_all()
-    clipboardGUI.present()
+print(clipboard.history)
 
 
 
-# hotkey pressed
+
+
+def clipHistGUI():
+    print('SUPER PASTE CALLED')
+
+
+
+# tracks if <cmd> is pressed but not released
+hotKeyPressed = False
+
 def onPress(key):
     global hotKeyPressed
 
     try:
+        print('pressed', key)
         if key == keyboard.Key.cmd:
             hotKeyPressed = True
         elif hotKeyPressed and key == keyboard.KeyCode.from_char('v'):
-            showHistory()
-            return False
+            hotKeyPressed = False
+            clipHistGUI()
     except AttributeError:
         pass
 
 
 
-# hotkey released
 def onRelease(key):
     global hotKeyPressed
 
     if key == keyboard.Key.cmd:
+        print('released cmd')
         hotKeyPressed = False
 
 
 
-# listen for key press and releases
-def hotKeyListener():
-    with keyboard.Listener(on_press=onPress, on_release=onRelease, suppress=True) as listener:
+def keyboardListener():
+    with keyboard.Listener(on_press=onPress, on_release=onRelease, suppress=False) as listener:
         listener.join()
 
-
-
-# initialize everything
-threading.Thread(target=hotKeyListener, daemon=True).start()    # threaded separate to prevent interference with Gtk.main() loop
-Gtk.main()
+keyListener = keyboardListener()
