@@ -18,7 +18,7 @@ maxClipboardItems = 20
 """  START OF PROGRAM  """
 
 import pyperclip
-from pynput import keyboard
+import keyboard
 import tkinter as tk
 
 
@@ -99,58 +99,13 @@ def clipHistGUI():
 
 
 
-# tracks if <cmd> is pressed but not released
-# tracks if <ctrl> is pressed but not released
-superPressed = False
-ctrlPressed = False
+def on_alt_v():
+  clipHistGUI()
 
-def onPress(key):
-  global superPressed
-  global ctrlPressed
+# WHY NO SUPPRESS???
+keyboard.add_hotkey('alt+v', on_alt_v, suppress=True, trigger_on_release=False)
 
-  try:
-    if key == keyboard.Key.ctrl:
-      ctrlPressed = True
-
-    elif key == keyboard.Key.cmd:
-      superPressed = True
-
-    elif ctrlPressed and key == keyboard.KeyCode.from_char('c'):
-      clipboard.addToHistory(pyperclip.paste(), True)   # paste from system keyboard to ClipHist
-      print('\n', pyperclip.paste())
-      return
-    
-    elif superPressed and key == keyboard.KeyCode.from_char('v'):
-      clipHistGUI()
-      return
-      
-  except AttributeError:
-    pass
-
-
-
-def onRelease(key):
-  global superPressed
-  global ctrlPressed
-
-  if (superPressed or ctrlPressed) and (key == keyboard.KeyCode.from_char('v') or keyboard.KeyCode.from_char('c')):
-    print('released binding')
-
-  if key == keyboard.Key.cmd:
-    print('released cmd')
-    superPressed = False
-
-  if key == keyboard.Key.ctrl_l:
-    print('released ctrl')
-    ctrlPressed = False
-
-
-
-def keyboardListener():
-  with keyboard.Listener(on_press=onPress, on_release=onRelease, suppress=False) as listener:
-    listener.join()
-
-
-
-# key listener ... GUI loop
-keyListener = keyboardListener()
+try:
+  keyboard.wait()
+except KeyboardInterrupt:
+  print('stopped')
