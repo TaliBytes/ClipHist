@@ -22,15 +22,12 @@ ClipHist is my attempt at a simple clipboard manager for Linux. Here's what it s
 
 ### Prerequisites
 
-ClipHist is built using Python and its pynput library. Install the following:
+ClipHist is built using Python and the pynput, pyperclip, and tkinter (tk) libraries. Install the following:
 
 ```console
 sudo apt update && sudo apt upgrade -y
-sudo apt install python3 python3-pynput 
+sudo apt install python3 python3-pynput python3-pyperclip
 ```
-<!-- libs no longer used -->
-<!-- sudo apt install gir1.2-gtk-3.0 libgtk-3-dev -->
-<!-- python3-threading python3-gi python3-gi-cairo -->
 
 ### Configure Service
 
