@@ -22,26 +22,41 @@ ClipHist is my attempt at a simple clipboard manager for Linux. Here's what it s
 
 ### Prerequisites
 
-ClipHist is built using Python and its pynput, pyperclip, and tkinter libraries. Install the following:
+ClipHist is built using Python and its sys, pyperclip, and tkinter libraries. Install the following:
 
 ```console
 sudo apt update && sudo apt upgrade -y
-sudo apt install python3 python3-pynput python3-pyperclip
+sudo apt install python3 python3-pyperclip
 ```
 
-### Configure Service
+### Configure ClipHist
 
-Copy the `ClipHist.service` repo file to `/etc/systemd/system/ClipHist.service`.
+#### A. Setup Background Service
 
-Make the following changes:
+1. Copy the `ClipHist.service` repo file to `/etc/systemd/system/ClipHist.service`
 
-1. Run `echo $DISPLAY` in your CLI to get your graphic display output. Make sure the `Environment="Display=XX"` lines in ClipHist.service matches the returned value (replace XX with returned value).
-2. Update `User=your-username` by replacing "your-username" with your profile name.
-3. Update `ExecStart=/usr/bin/python3 /path/to/ClipHist.py` by replacing "path/to/ClipHist.py" to whatever directory ClipHist.py is stored in our your system.
+2. Make the following changes:
 
-Enable the service by running `sudo systemctl enable --now ClipHist.service`. It is recommended to check if the services is working correctly by running `journalctl -u ClipHist.service`.
+    - Run `echo $DISPLAY` in your CLI to get your graphic display output. Make sure the `Environment="Display=XX"` lines in ClipHist.service matches the returned value (replace XX with returned value).
+    - Update `User=your-username` by replacing "your-username" with your profile name.
+    - Update `ExecStart=/usr/bin/python3 /path/to/ClipHist.py` by replacing "path/to/ClipHist.py" to whatever directory ClipHist.py is stored in our your system.
+
+3. Enable the service by running `sudo systemctl enable --now ClipHist.service`
+4. Verify the service is working by runnign `journalctl -u ClipHist.service`
 
 If you make a change to the program, run `sudo systemctl restart ClipHist.service`.
+
+#### B. Setup Super Paste Shortcut
+
+1. Copy the `ClipHist.superPaste.trigger.sh` to a directory of your choosing. It is recommended to store this shell script in the same directory as ClipHist.py.
+
+2. To setup the keyboard shortcut (for Linux Mint... other distros may differ):
+
+    - Open **Settings > Keyboard > Shortcuts**
+    - Create a new shortcut named **"ClipHist Super Paste"** with the command `/path/to/ClipHist.superPaste.trigger.sh`
+    - Enter "cmd+v" (likely to appear as "super+v") to the shortcut. Any other binding will also work.
+
+Now that ClipHist.py and the ClipHist.superPaste.trigger.sh shell script are in place, a keybind is created to execute the shell script, and the ClipHist service is configured and enabled... ClipHist should, in theory, be working correctly.
 
 ## Contributing
 

@@ -16,10 +16,10 @@ maxClipboardItems = 20
 
 
 """  START OF PROGRAM  """
-
-import pyperclip
-import keyboard
-import tkinter as tk
+  
+import pyperclip        # used to manage system clipboard
+import sys              # used to listen for cmd+v
+import tkinter as tk    # used for copy history gui
 
 
 class tClipboardManager:
@@ -82,8 +82,6 @@ def clipHistGUI():
   frame = tk.Frame(root, background="gray15")
   frame.grid()
 
-  print('\n\n', len(clipboard.history), clipboard.history, '\n\n')
-
   # add ClipHist items to frame
   for position, item in enumerate(clipboard.history):
     position = clipboard.history.index(item)
@@ -99,13 +97,36 @@ def clipHistGUI():
 
 
 
-def on_alt_v():
+def on_cmd_v():
   clipHistGUI()
 
-# WHY NO SUPPRESS???
-keyboard.add_hotkey('alt+v', on_alt_v, suppress=True, trigger_on_release=False)
 
-try:
-  keyboard.wait()
-except KeyboardInterrupt:
-  print('stopped')
+
+def commandProcessor(cmd):
+  cmd = str(cmd).strip()
+  
+  if cmd == 'trigger_cmd_v':
+    on_cmd_v()
+  else: print('not listening for ' + cmd)
+
+
+
+def commandListener():
+  # listen cmd+v ...
+  # cmd+v command run through the named pipe in PIPE_PATH created by ClipHist.superPaste.trigger.sh
+
+  PIPE_PATH = '/tmp/ClipHistPipe'
+
+  with open(PIPE_PATH, 'r') as pipe:
+    try:
+      while True:
+        cmd = pipe.readline().strip()
+        if cmd:
+          commandProcessor(cmd)
+    except:
+      print('\nterminated program\n\n')
+  
+
+
+# initialize command listener
+commandListener()
