@@ -16,10 +16,11 @@ maxClipboardItems = 20
 
 
 """  START OF PROGRAM  """
-  
-import pyperclip        # used to manage system clipboard
-import sys              # used to listen for cmd+v
-import tkinter as tk    # used for copy history gui
+
+from pynput import keyboard   # ctrl+c listener
+import pyperclip              # used to manage system clipboard
+import threading              # used to run multiple listeners concurrently
+import tkinter as tk          # used for copy history gui
 
 
 class tClipboardManager:
@@ -99,6 +100,41 @@ def clipHistGUI():
 
 def on_cmd_v():
   clipHistGUI()
+ 
+
+
+ctrlPressed = False
+
+def onPress(key):
+  global ctrlPressed
+
+  try:
+    if key == keyboard.Key.ctrl:
+      ctrlPressed = True
+      return
+
+    elif ctrlPressed and key == keyboard.KeyCode.from_char('c'):
+      clipboard.addToHistory(pyperclip.paste(), True)
+      return
+    
+  except AttributeError:
+    pass
+  
+
+
+def onRelease(key):
+  global ctrlPressed
+
+  if key == keyboard.Key.ctrl:
+    ctrlPressed = False
+    return
+  
+
+
+def keyboardListener():
+  # listen for ctrl+c
+  with keyboard.Listener(on_press=onPress, on_release=onRelease, suppress=False) as listener:
+    listener.join()
 
 
 
@@ -112,8 +148,8 @@ def commandProcessor(cmd):
 
 
 def commandListener():
-  # listen cmd+v ...
-  # cmd+v command run through the named pipe in PIPE_PATH created by ClipHist.superPaste.trigger.sh
+  # listen for named pipe commands such as cmd+v ...
+  # commands run through the named pipe in PIPE_PATH created by ClipHist.superPaste.trigger.sh
 
   PIPE_PATH = '/tmp/ClipHistPipe'
 
@@ -125,8 +161,17 @@ def commandListener():
           commandProcessor(cmd)
     except:
       print('\nterminated program\n\n')
-  
 
 
-# initialize command listener
-commandListener()
+
+if __name__ == '__main__':
+  # initialize named pipe and keyboard listeners
+
+  keyListenerThread = threading.Thread(target=keyboardListener, daemon=True)
+  cmdListenerThread = threading.Thread(target=commandListener, daemon=True)
+
+  cmdListenerThread.start()
+  keyListenerThread.start()
+
+  cmdListenerThread.join()
+  keyListenerThread.join()
