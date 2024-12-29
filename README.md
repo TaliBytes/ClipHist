@@ -11,8 +11,8 @@ To be straight-forward, I'm not satisfied with any of the existing clipboard man
 ClipHist is my attempt at a simple clipboard manager for Linux. Here's what it should do:
 
 1. Copying to the built-in clipboard (`ctrl+c`) should also store the item to ClipHist.
-2. Pasting from the built-in clipboard (`ctrl+v`) does not affect ClipHist's stored items (up to 20).
-3. A GUI should open using `cmd+v` (aka `super+v`). Historically copied items are navigatable using arrows keys (and enter) or mouse. Selecting an item:
+2. Pasting from the built-in clipboard (`ctrl+v`) does not affect ClipHist's stored items (up to 20 or user defined amount).
+3. A GUI should open using `cmd+v` (aka `super+v`). Historically copied items are navigatable using arrows keys (and enter) or mouse. Selecting an item for paste:
     - Moves it to the "most recent" spot in ClipHist
     - Pastes it into the current selected field
     - "Copies" that item to the system's built-in clipboard
@@ -22,7 +22,7 @@ ClipHist is my attempt at a simple clipboard manager for Linux. Here's what it s
 
 ### Prerequisites
 
-ClipHist is built using Python and its sys, pyperclip, tkinter, and threading libraries. Install the following:
+ClipHist is built using Python and its pyperclip, threading, time, and tkinter libraries. Install the following:
 
 ```console
 sudo apt update && sudo apt upgrade -y
