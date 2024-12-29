@@ -93,7 +93,7 @@ def clipHistGUI():
               justify='left', anchor="nw",
               background="gray20", foreground="gray80",
               text=f"{item}"
-            ).grid(column=0, row=(position+1), ipadx=1, ipady=5, padx=(12,12), pady=(15,0))
+            ).grid(column=0, row=position, ipadx=1, ipady=5, padx=(12,12), pady=(15,0))
     
   root.mainloop()
 
