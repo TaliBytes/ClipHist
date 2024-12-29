@@ -17,10 +17,10 @@ maxClipboardItems = 20
 
 """  START OF PROGRAM  """
 
-from pynput import keyboard   # ctrl+c listener
-import pyperclip              # used to manage system clipboard
+import pyperclip              # used to manage system clipboard and listen for changes
 import threading              # used to run multiple listeners concurrently
 import tkinter as tk          # used for copy history gui
+import time                   # used for delay in clipboard change listener
 
 
 class tClipboardManager:
@@ -84,57 +84,18 @@ def clipHistGUI():
   frame.grid()
 
   # add ClipHist items to frame
+  print(clipboard.history, len(clipboard.history))
+
   for position, item in enumerate(clipboard.history):
-    position = clipboard.history.index(item)
     tk.Label(frame,
               width=47, height=4,
               wraplength=372,
               justify='left', anchor="nw",
               background="gray20", foreground="gray80",
               text=f"{item}"
-            ).grid(column=0, row=position, ipadx=1, ipady=5, padx=(12,12), pady=(15,0))
+            ).grid(column=0, row=(position+1), ipadx=1, ipady=5, padx=(12,12), pady=(15,0))
     
   root.mainloop()
-
-
-
-def on_cmd_v():
-  clipHistGUI()
- 
-
-
-ctrlPressed = False
-
-def onPress(key):
-  global ctrlPressed
-
-  try:
-    if key == keyboard.Key.ctrl:
-      ctrlPressed = True
-      return
-
-    elif ctrlPressed and key == keyboard.KeyCode.from_char('c'):
-      clipboard.addToHistory(pyperclip.paste(), True)
-      return
-    
-  except AttributeError:
-    pass
-  
-
-
-def onRelease(key):
-  global ctrlPressed
-
-  if key == keyboard.Key.ctrl:
-    ctrlPressed = False
-    return
-  
-
-
-def keyboardListener():
-  # listen for ctrl+c
-  with keyboard.Listener(on_press=onPress, on_release=onRelease, suppress=False) as listener:
-    listener.join()
 
 
 
@@ -142,7 +103,7 @@ def commandProcessor(cmd):
   cmd = str(cmd).strip()
   
   if cmd == 'trigger_cmd_v':
-    on_cmd_v()
+    clipHistGUI()
   else: print('not listening for ' + cmd)
 
 
@@ -164,14 +125,31 @@ def commandListener():
 
 
 
+def clipboardChangeListener():
+  previousContent = None
+  while True:
+    try:
+      currentContent = pyperclip.paste()
+      if currentContent != previousContent:
+        previousContent = currentContent  # update previous content to match the current, since there has been a change
+        clipboard.addToHistory(currentContent, False)
+        print(f'added {currentContent}')
+    except Exception as err:
+      print(f'Error accessing clipboard: {err}')
+
+    # sleep for half a second between iterations
+    time.sleep(.5)
+
+
+
 if __name__ == '__main__':
-  # initialize named pipe and keyboard listeners
+  # initialize named pipe and clipboard listeners
 
-  keyListenerThread = threading.Thread(target=keyboardListener, daemon=True)
   cmdListenerThread = threading.Thread(target=commandListener, daemon=True)
+  copyListener = threading.Thread(target=clipboardChangeListener, daemon=True)
 
+  copyListener.start()
   cmdListenerThread.start()
-  keyListenerThread.start()
 
+  copyListener.join()
   cmdListenerThread.join()
-  keyListenerThread.join()
