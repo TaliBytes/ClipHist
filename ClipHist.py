@@ -16,7 +16,7 @@ maxClipboardItems = 20
 
 
 """  START OF PROGRAM  """
-import os                           # manages named pipe
+import os                           # used to check if named pipe exists
 from pyautogui import position      # open GUI next to mouse
 from pyautogui import hotkey        # simulate paste from system clipboard
 import pyperclip                    # used to manage system clipboard and listen for changes
@@ -154,21 +154,19 @@ def commandListener():
 
   PIPE_PATH = '/tmp/ClipHistPipe'
 
-  if not os.path.exists(PIPE_PATH):
-    with open(PIPE_PATH, 'w+') as pipe:
-      pipe.close()  # close immediately after creating
+  # wait until the named pipe exists
+  while not os.path.exists(PIPE_PATH):
+    sleep(.5)
+    continue
 
-  try:
-    with open(PIPE_PATH, 'r') as pipe:
-      try:
-        while True:
-          cmd = pipe.readline().strip()
-          if cmd:
-            commandProcessor(cmd)
-      except Exception as err:
-        print(f"\nTerminated program with error: {err}")
-  except:
-    print(f"\nCouldn't open or create {PIPE_PATH} ... error: {err}")
+  with open(PIPE_PATH, 'r') as pipe:
+    try:
+      while True:
+        cmd = pipe.readline().strip()
+        if cmd:
+          commandProcessor(cmd)
+    except Exception as err:
+      print(f"\nTerminated program with error: {err}")
 
 
 
