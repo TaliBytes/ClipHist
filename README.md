@@ -1,6 +1,6 @@
 # Linux Clipboard History Manager (ClipHist)
 
-## WARNING - APP IS STILL IN DEVELOPMENT AND NON FUNCTIONAL
+## WARNING - APP IS STILL IN DEVELOPMENT BUT IS SOMEWHAT FUNCTIONAL
 
 Linux is an open source OS with (typically) minimal bloat pre-installed. This has the obvious advantage of no bloat but has the disadvantage that features one may consider key are simply missing from the experience. Up until recently, I've used Windows in my typical day-to-day work-flow (be it back when I was in school, today as a coder, or at various times I am word processing). I consistently used the Windows "Clipboard History" utility that is built into Windows. Upon moving to Linux I discovered that, not surprisingly, such a feature is not built into the few distros I've tried up till now.
 
@@ -10,9 +10,9 @@ To be straight-forward, I'm not satisfied with any of the existing clipboard man
 
 ClipHist is my attempt at a simple clipboard manager for Linux. Here's what it should do:
 
-1. Copying to the built-in clipboard (`ctrl+c`) should also store the item to ClipHist.
+1. Copying to the built-in clipboard (`ctrl+c`) should also store the item to ClipHist (for both text and images).
 2. Pasting from the built-in clipboard (`ctrl+v`) does not affect ClipHist's stored items (up to 20 or user defined amount).
-3. A GUI should open using `cmd+v` (aka `super+v`). Historically copied items are navigatable using arrows keys (and enter) or mouse. Selecting an item for paste:
+3. A GUI should open using `cmd+v` (aka `super+v`). Historically copied items are navigatable using mouse. Selecting an item for paste:
     - Moves it to the "most recent" spot in ClipHist
     - Pastes it into the current selected field
     - "Copies" that item to the system's built-in clipboard
