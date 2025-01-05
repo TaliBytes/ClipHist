@@ -22,11 +22,11 @@ ClipHist is my attempt at a simple clipboard manager for Linux. Here's what it s
 
 ### Prerequisites
 
-ClipHist is built using Python and its pyperclip, threading, time, and tkinter libraries. Install the following:
+ClipHist is built using Python and its pyautogui, pyperclip, threading, time, and tkinter libraries. Install the following:
 
 ```console
 sudo apt update && sudo apt upgrade -y
-sudo apt install python3 python3-pyperclip
+sudo apt install python3 python3-pyperclip python3-pyautogui
 ```
 
 ### Configure ClipHist
@@ -41,8 +41,8 @@ sudo apt install python3 python3-pyperclip
     - Update `User=your-username` by replacing "your-username" with your profile name.
     - Update `ExecStart=/usr/bin/python3 /path/to/ClipHist.py` by replacing "path/to/ClipHist.py" to whatever directory ClipHist.py is stored in our your system.
 
-3. Enable the service by running `sudo systemctl enable --now ClipHist.service`
-4. Verify the service is working by runnign `journalctl -u ClipHist.service`
+3. Enable the service by running `sudo systemctl enable ClipHist.service` then start it with `sudo systemctl start ClipHist.service`
+4. Verify the service is working by running using `systemctl status ClipHist.service` and logs using `journalctl -u ClipHist.service`
 
 If you make a change to the program, run `sudo systemctl restart ClipHist.service`.
 
