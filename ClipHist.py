@@ -16,12 +16,13 @@ maxClipboardItems = 20
 
 
 """  START OF PROGRAM  """
+import os                           # manages named pipe
 from pyautogui import position      # open GUI next to mouse
 from pyautogui import hotkey        # simulate paste from system clipboard
 import pyperclip                    # used to manage system clipboard and listen for changes
 import threading                    # used to run multiple listeners concurrently
+from time import sleep              # reduces number of clipboard checks by waiting
 from tkinter import *               # used for copy history gui
-from time import sleep
 
 
 class tClipboardManager:
@@ -143,7 +144,7 @@ def commandProcessor(cmd):
       clipHistGUI()
     except Exception as err:
       print(f"\nError rendering GUI: {err}")
-  else: print('not listening for ' + cmd)
+  else: print('Not listening for ' + cmd)
 
 
 
@@ -153,14 +154,21 @@ def commandListener():
 
   PIPE_PATH = '/tmp/ClipHistPipe'
 
-  with open(PIPE_PATH, 'r') as pipe:
-    try:
-      while True:
-        cmd = pipe.readline().strip()
-        if cmd:
-          commandProcessor(cmd)
-    except:
-      print('\nterminated program\n\n')
+  if not os.path.exists(PIPE_PATH):
+    with open(PIPE_PATH, 'w+') as pipe:
+      pipe.close()  # close immediately after creating
+
+  try:
+    with open(PIPE_PATH, 'r') as pipe:
+      try:
+        while True:
+          cmd = pipe.readline().strip()
+          if cmd:
+            commandProcessor(cmd)
+      except Exception as err:
+        print(f"\nTerminated program with error: {err}")
+  except:
+    print(f"\nCouldn't open or create {PIPE_PATH} ... error: {err}")
 
 
 
@@ -173,10 +181,10 @@ def clipboardChangeListener():
         previousContent = currentContent  # update previous content to match the current, since there has been a change
         clipboard.addToHistory(currentContent, False)
     except Exception as err:
-      print(f'Error accessing clipboard: {err}')
+      print(f'\nError accessing clipboard: {err}')
 
-    # sleep for half a second between iterations
-    sleep(.5)
+    # sleep for between checks
+    sleep(.25)
 
 
 

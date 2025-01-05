@@ -1,12 +1,13 @@
 [Unit]
-Description=ClipHist Service
-After=grahpical.target
+Description=Clipboard Manager Service - ClipHist
+After=grahpical.target display-manager.service
 
 [Service]
 User=your-username
-Environment="DISPLAY=:0"
+Environment="DISPLAY=XX"
 ExecStart=/usr/bin/python3 /path/to/ClipHist.py
-Restart=on-failure
+Restart=always
+RestartSec=5
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical.target
