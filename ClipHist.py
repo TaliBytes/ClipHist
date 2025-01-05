@@ -16,11 +16,12 @@ maxClipboardItems = 20
 
 
 """  START OF PROGRAM  """
-
-import pyperclip              # used to manage system clipboard and listen for changes
-import threading              # used to run multiple listeners concurrently
-import tkinter as tk          # used for copy history gui
-import time                   # used for delay in clipboard change listener
+from pyautogui import position      # open GUI next to mouse
+from pyautogui import hotkey        # simulate paste from system clipboard
+import pyperclip                    # used to manage system clipboard and listen for changes
+import threading                    # used to run multiple listeners concurrently
+from tkinter import *               # used for copy history gui
+from time import sleep
 
 
 class tClipboardManager:
@@ -73,29 +74,64 @@ clipboard = tClipboardManager()
 
 
 def clipHistGUI():
-  # create and show GUI
-  root = tk.Tk()
+  root = Tk()
+  mouseX = position().x
+  mouseY = position().y
+  root.geometry(f"405x450+{mouseX}+{mouseY}")
+
   root.title('ClipHist')
-  root.geometry('405x450')
   root["background"] = "gray15"
   root.resizable(False, False)
 
-  frame = tk.Frame(root, background="gray15")
-  frame.grid()
+  scrollbar = Scrollbar(root)
+  scrollbar.pack(side=RIGHT, fill=Y)
 
-  # add ClipHist items to frame
-  print(clipboard.history, len(clipboard.history))
+  historyList = Text(
+    root,
+    background="gray20",
+    foreground="gray80",
+    selectbackground="gray50",
+    selectforeground="white",
+    wrap="word",
+    yscrollcommand=scrollbar.set
+  )
 
-  for position, item in enumerate(clipboard.history):
-    tk.Label(frame,
-              width=47, height=4,
-              wraplength=372,
-              justify='left', anchor="nw",
-              background="gray20", foreground="gray80",
-              text=f"{item}"
-            ).grid(column=0, row=position, ipadx=1, ipady=5, padx=(12,12), pady=(15,0))
+  historyList.pack(side=LEFT, fill=BOTH, expand=True)
+  scrollbar.config(command=historyList.yview)
+
+  for index, item in enumerate(clipboard.history):
+    tagName = f"item_{index}"
+    spacerTagName = f"{tagName}_spacer"
+    historyList.insert(END, f"{item}\n", tagName)
+
+    historyList.tag_config(
+      tagName,
+      foreground="white",
+      background="gray30",
+      font=("Arial",12),
+      spacing1=5,
+      spacing3=5
+    )
+    historyList.tag_bind(tagName, "<Button-1>", lambda e, i=index: onSelect(i))
+
+    historyList.insert(END, "\n", spacerTagName)
+    historyList.tag_config(
+      spacerTagName,
+      background="gray20"
+    )
+
+
+  def onSelect(index):
+    # close ClipHist GUI
+    root.destroy()
     
-  root.mainloop()
+    # bring to top of clipboard, put in system clipboard
+    clipboard.addToHistory(clipboard.history[index], True)
+    
+    # paste from system clipboard after small delay to resume focus on previous
+    hotkey('ctrl', 'v')
+
+  mainloop()
 
 
 
@@ -103,7 +139,10 @@ def commandProcessor(cmd):
   cmd = str(cmd).strip()
   
   if cmd == 'trigger_cmd_v':
-    clipHistGUI()
+    try:
+      clipHistGUI()
+    except Exception as err:
+      print(f"\nError rendering GUI: {err}")
   else: print('not listening for ' + cmd)
 
 
@@ -133,12 +172,11 @@ def clipboardChangeListener():
       if currentContent != previousContent:
         previousContent = currentContent  # update previous content to match the current, since there has been a change
         clipboard.addToHistory(currentContent, False)
-        print(f'added {currentContent}')
     except Exception as err:
       print(f'Error accessing clipboard: {err}')
 
     # sleep for half a second between iterations
-    time.sleep(.5)
+    sleep(.5)
 
 
 
