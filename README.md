@@ -25,8 +25,8 @@ ClipHist is my attempt at a simple clipboard manager for Linux. Here's what it s
 ClipHist is built using Python and its os, pyautogui, pyperclip, threading, time, and tkinter libraries. Install the following:
 
 ```console
-sudo apt update && sudo apt upgrade -y
-sudo apt install python3 python3-pyperclip python3-pyautogui
+sudo apt update && apt upgrade -y
+sudo apt install python3 python3-pyperclip python3-pyautogui python3-tk
 ```
 
 ### Configure ClipHist
@@ -44,7 +44,7 @@ sudo apt install python3 python3-pyperclip python3-pyautogui
 3. Enable the service by running `sudo systemctl enable ClipHist.service` then start it with `sudo systemctl start ClipHist.service`
 4. Verify the service is working by running using `systemctl status ClipHist.service` and view logs using `journalctl -u ClipHist.service`
 
-If you make a change to the program, run `sudo systemctl restart ClipHist.service`.
+If you make a change to the program, run `sudo systemctl daemon-reload && systemctl restart ClipHist.service`.
 
 #### B. Setup Super Paste Shortcut
 
