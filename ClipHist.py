@@ -76,83 +76,29 @@ clipboard = tClipboardManager()
 
 
 def clipHistGUI():
-  #root = Tk()
-  #mouseX = position().x
-  #mouseY = position().y
-  #root.geometry(f"405x450+{mouseX - 202.5}+{mouseY - 225}")
-#
-  #root.title('ClipHist')
-  #root["background"] = "gray15"
-  #root.resizable(False, False)
+  # whether ClipHist should attempt to paste (ctrl+v) upon GUI close
+  doPaste = False
 
-  #scrollbar = Scrollbar(root)
-  #scrollbar.pack(side=RIGHT, fill=Y)
-#
-  #historyList = Text(
-  #  root,
-  #  background="gray20",
-  #  foreground="gray80",
-  #  selectbackground="gray50",
-  #  selectforeground="white",
-  #  wrap="word",
-  #  yscrollcommand=scrollbar.set
-  #)
-#
-  #historyList.pack(side=LEFT, fill=BOTH, expand=True)
-  #scrollbar.config(command=historyList.yview)
-#
-  #for index, item in enumerate(clipboard.history):
-  #  tagName = f"item_{index}"
-  #  spacerTagName = f"{tagName}_spacer"
-  #  historyList.insert(END, f"{item}\n", tagName)
-#
-  #  historyList.tag_config(
-  #    tagName,
-  #    foreground="white",
-  #    background="gray30",
-  #    font=("Arial",12),
-  #    spacing1=5,
-  #    spacing3=5
-  #  )
-  #  historyList.tag_bind(tagName, "<Button-1>", lambda e, i=index: onSelect(i))
-#
-  #  historyList.insert(END, "\n", spacerTagName)
-  #  historyList.tag_config(
-  #    spacerTagName,
-  #    background="gray20"
-  #  )
-#
-#
-  #def onSelect(index):
-  #  # close ClipHist GUI
-  #  root.destroy()
-  #  
-  #  # bring to top of clipboard, put in system clipboard
-  #  clipboard.addToHistory(clipboard.history[index], True)
-  #  
-  #  # paste from system clipboard after small delay to resume focus on previous
-  #  hotkey('ctrl', 'v')
-#
-  #mainloop()
-
-
-  #GENERATED WITH TKINTER DESIGNER
   assets_path = os.path.dirname(__file__)
   assets_path = assets_path + '/assets/'
-  print(assets_path)
 
+  # create 418x450 tkinter GUI that appears under mouse
   root = Tk()
   mouseX = position().x - 202
-  mouseY = position().y - 225
-  root.geometry(f"405x450+{(mouseX)}+{(mouseY)}")
+  mouseY = position().y - 45
+  root.geometry(f"418x450+{(mouseX)}+{(mouseY)}") # 418 instead of 405 to accomdate space for scrollbar (with width of 13)
 
   root.title('ClipHist')
   root["background"] = "gray15"
   root.resizable(False, False)
 
+  icon = PhotoImage(file = assets_path + "ClipHist.png")
+  root.iconphoto(True, icon)
+
+  # create canvas in the GUI, to which everything else (except scrollbar) is bound
   canvas = Canvas(
     root,
-    bg = "gray15",
+    bg = "#1E1E1E",
     height = 450,
     width = 405,
     bd = 0,
@@ -160,6 +106,11 @@ def clipHistGUI():
     relief = "ridge"
   )
   canvas.place(x=0,y=0)
+
+  # configure scrollbar to scroll the canvas
+  scrollbar = Scrollbar(root, orient=VERTICAL, command=canvas.yview)
+  scrollbar.pack(side=RIGHT, fill=Y)
+  canvas.config(yscrollcommand=scrollbar.set)
 
   # BACKGROUND
   canvas.create_rectangle(
@@ -171,59 +122,88 @@ def clipHistGUI():
     outline=""
   )
 
-
-  # LOOP  COPIED ITEMS (lower python program line number = lower z-index in rendered GUI)
-
-  # SPACER RECTANGLE (BLUE)
-  canvas.create_rectangle(
-    0.0,
-    73.0,
-    405.0,
-    82.0,
-    fill = "#0000FF",
-    outline=""
-  )
-
-  # image for background of copied item, and image added to canvas
+  # LOOP COPIED ITEMS (lower python program line number = lower z-index in rendered GUI)
   image_image_copiedItem = PhotoImage(file = assets_path + "rounded_button.png")
-  image_copiedItem = canvas.create_image(
-    202.0,
-    45.0,
-    image = image_image_copiedItem
-  )
 
-  canvas.create_text(
-    13.0,
-    14.0,
-    anchor="nw",
-    text="SomeTypedText",
-    fill="#FFFFFF",
-    font=("Inter", 12 * -1)
-  )
+  for index, item in enumerate(clipboard.history):
+    # 47 = gap, 73 = added gap per item shown in GUI
+    yPos = 47 + index * 73
 
+    item_background = canvas.create_image(
+      202.0, yPos, image = image_image_copiedItem
+    )
 
-  # BOTTOM BORDER RECTANGLE (RED)
-  canvas.create_rectangle(
-    0.0,
-    442.0,
-    405.0,
-    450.0,
-    fill = "#FF0000",
-    outline=""
-  )
+    # handle text items
+    if isinstance(item, str):
+      itemText = item.replace('\n\n', '\n')       # replace multiple new lines with single ones for better preview
+      itemText = itemText.replace('\n', ' ' * 50) # replace newlines with 50 empty chars for string len counting purposes (to be changed back)
+      itemText = itemText[:180]
+      itemText = itemText.replace(' ' * 50, '\n') # replace 50 spaces with newline now that item length is counted
+      if len(item) >= 180: itemText = itemText + '...'
 
-  # TOP BORDER RECTANGLE (RED)
-  canvas.create_rectangle(
-    0.0,
-    0.0, 
-    405.0,
-    9.0,
-    fill = "#FF0000",
-    outline=""
-  )
+      canvas.create_text(
+        16.0, yPos-32,
+        anchor="nw",
+        text=itemText,
+        fill="#FFFFFF",
+        font=("Inter", 13 * -1),
+        width=376
+      )
 
+    # handle other items  
+    else:
+      print('non-text items not supported yet')
+
+    clickable_zone = canvas.create_rectangle(
+      0, yPos-36,
+      405,yPos+28,
+      outline="",
+      fill="",
+      tags=f"item_{index}"
+    )
+
+    canvas.tag_bind(
+      f"item_{index}",
+      "<Button-1>",
+      lambda e, i=index: onSelect(i)
+    )
+  # END LOOP COPIED ITEMS
+
+  # when a copied item is selected from GUI
+  def onSelect(index):
+    # quit GUI mainloop
+    root.quit()
+
+    # bring copied item to top of clipboard, put in system clipboard
+    clipboard.addToHistory(clipboard.history[index], True)
+    
+    # prime paste from system clipboard... paste occurs after GUI closes to ensure original input is selected
+    nonlocal doPaste
+    doPaste = True
+
+  # UPDATE SCROLLABLE AREA
+  canvas.config(scrollregion=canvas.bbox("all"))
+
+  # MOUSE WHEEL scrollability for canvas+scrollbar
+  def on_mouse_wheel(e):
+    if e.num == 4:  # Linux scroll up
+      canvas.yview_scroll(-1, "units")
+
+    if e.num == 5:  # Linux scroll down
+      canvas.yview_scroll(1, "units")
+
+  root.bind_all('<Button-4>', on_mouse_wheel)
+  root.bind_all('<Button-5>', on_mouse_wheel)
+
+  # MAIN GUI LOOP
   root.mainloop()
+  root.destroy()    # destroy upon quit if it still exists
 
+  # paste after GUI closes
+  if doPaste:
+    hotkey('ctrl', 'v')
+    doPaste = False # reset
+    
 
 
 def commandProcessor(cmd):
