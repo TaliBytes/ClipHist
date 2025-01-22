@@ -23,7 +23,6 @@ import pyperclip                    # used to manage system clipboard and listen
 import threading                    # used to run multiple listeners concurrently
 from time import sleep              # reduces number of clipboard checks by waiting
 from tkinter import *               # used for copy history gui
-#from tkinter import Tk, Canvas, PhotoImage
 
 
 class tClipboardManager:
