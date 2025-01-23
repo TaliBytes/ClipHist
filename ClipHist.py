@@ -25,6 +25,9 @@ from time import sleep              # reduces number of clipboard checks by wait
 from tkinter import *               # used for copy history gui
 
 
+
+
+
 class tClipboardManager:
   def __init__(self):
     # self.history stores all items
@@ -71,6 +74,8 @@ class tClipboardManager:
     return
 
 clipboard = tClipboardManager()
+
+
 
 
 
@@ -121,6 +126,7 @@ def clipHistGUI():
     outline=""
   )
 
+
   # LOOP COPIED ITEMS (lower python program line number = lower z-index in rendered GUI)
   image_image_copiedItem = PhotoImage(file = assets_path + "rounded_button.png")
 
@@ -168,6 +174,7 @@ def clipHistGUI():
     )
   # END LOOP COPIED ITEMS
 
+
   # when a copied item is selected from GUI
   def onSelect(index):
     # quit GUI mainloop
@@ -183,6 +190,7 @@ def clipHistGUI():
   # UPDATE SCROLLABLE AREA
   canvas.config(scrollregion=canvas.bbox("all"))
 
+
   # MOUSE WHEEL scrollability for canvas+scrollbar
   def on_mouse_wheel(e):
     if e.num == 4:  # Linux scroll up
@@ -193,6 +201,14 @@ def clipHistGUI():
 
   root.bind_all('<Button-4>', on_mouse_wheel)
   root.bind_all('<Button-5>', on_mouse_wheel)
+
+
+  # CLOSE ON LOSE FOCUS
+  def on_focus_out(e):
+    root.quit()
+
+  root.bind_all("<FocusOut>", on_focus_out)
+
 
   # MAIN GUI LOOP
   root.mainloop()
@@ -205,6 +221,8 @@ def clipHistGUI():
     
 
 
+
+
 def commandProcessor(cmd):
   cmd = str(cmd).strip()
   
@@ -214,6 +232,8 @@ def commandProcessor(cmd):
     except Exception as err:
       print(f"\nError rendering GUI: {err}")
   else: print('Not listening for ' + cmd)
+
+
 
 
 
@@ -239,6 +259,8 @@ def commandListener():
 
 
 
+
+
 def clipboardChangeListener():
   previousContent = None
   while True:
@@ -252,6 +274,8 @@ def clipboardChangeListener():
 
     # sleep for between checks
     sleep(.25)
+
+
 
 
 
