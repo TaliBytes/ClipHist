@@ -93,6 +93,7 @@ def clipHistGUI():
   root.geometry(f"418x450+{(mouseX)}+{(mouseY)}") # 418 instead of 405 to accomdate space for scrollbar (with width of 13)
 
   root.title('ClipHist')
+  #root.overrideredirect(True)   # remove toolbar ... ALSO CAUSES LOSE FOCUS => CLOSE APP TO CEASE FUNCTIONING
   root["background"] = "gray15"
   root.resizable(False, False)
 
