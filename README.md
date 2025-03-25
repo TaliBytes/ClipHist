@@ -65,3 +65,8 @@ Contributions are currently not accepted on this project. This may chagne at a l
 ## License
 
 This project is licensed under the MIT License.
+
+## Additional Information
+
+- [Official ClipHist Website](https://cliphist.com)
+- Please Feel free to [BuyMeACoffee](https://buymeacoffee.com/talibytes) if you use and appreciate ClipHist and want to support my work. Thank you!
