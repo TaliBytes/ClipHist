@@ -113,8 +113,12 @@ def clipHistGUI():
   canvas.place(x=0,y=0)
 
   # configure scrollbar to scroll the canvas
-  scrollbar = Scrollbar(root, orient=VERTICAL, command=canvas.yview)
+  scrollbar_frame = Frame(root, bg="gray15", padx=3, pady=5)
+  scrollbar_frame.pack(side=RIGHT, fill=Y)
+
+  scrollbar = Scrollbar(scrollbar_frame, orient=VERTICAL, command=canvas.yview)
   scrollbar.pack(side=RIGHT, fill=Y)
+  scrollbar.config(bg="#4E4E4E", activebackground="#5E5E5E", troughcolor="gray15", border=0, borderwidth=0, relief="flat")
   canvas.config(yscrollcommand=scrollbar.set)
 
   # BACKGROUND
@@ -129,14 +133,14 @@ def clipHistGUI():
 
 
   # LOOP COPIED ITEMS (lower python program line number = lower z-index in rendered GUI)
-  image_image_copiedItem = PhotoImage(file = assets_path + "rounded_button.png")
+  btn_img = PhotoImage(file = assets_path + "rounded_button.png")
 
   for index, item in enumerate(clipboard.history):
     # 47 = gap, 73 = added gap per item shown in GUI
     yPos = 47 + index * 73
 
     item_background = canvas.create_image(
-      202.0, yPos, image = image_image_copiedItem
+      202.0, yPos, image = btn_img
     )
 
     # handle text items
@@ -217,6 +221,7 @@ def clipHistGUI():
 
   # paste after GUI closes
   if doPaste:
+    sleep(.05)  # small delay to allow previously focussed item to regain focus
     hotkey('ctrl', 'v')
     doPaste = False # reset
     
