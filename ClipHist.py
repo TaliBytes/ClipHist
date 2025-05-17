@@ -19,7 +19,7 @@ maxClipboardItems = 20
 import os                           # used to check if named pipe exists, get assets for GUI
 from pyautogui import position      # open GUI next to mouse
 from pyautogui import hotkey        # simulate paste from system clipboard
-import pyperclip                    # used to manage system clipboard and listen for changes
+import pyperclip                    # used to manage system clipboard TEXT
 import threading                    # used to run multiple listeners concurrently
 from time import sleep              # reduces number of clipboard checks by waiting
 from tkinter import *               # used for copy history gui
@@ -83,8 +83,7 @@ def clipHistGUI():
   # whether ClipHist should attempt to paste (ctrl+v) upon GUI close
   doPaste = False
 
-  assets_path = os.path.dirname(__file__)
-  assets_path = assets_path + '/assets/'
+  assets_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
 
   # create 418x450 tkinter GUI that appears under mouse
   root = Tk()
@@ -97,7 +96,7 @@ def clipHistGUI():
   root["background"] = "gray15"
   root.resizable(False, False)
 
-  icon = PhotoImage(file = assets_path + "ClipHist.png")
+  icon = PhotoImage(file = assets_path + "/ClipHist.png")
   root.iconphoto(True, icon)
 
   # create canvas in the GUI, to which everything else (except scrollbar) is bound
@@ -133,7 +132,7 @@ def clipHistGUI():
 
 
   # LOOP COPIED ITEMS (lower python program line number = lower z-index in rendered GUI)
-  btn_img = PhotoImage(file = assets_path + "rounded_button.png")
+  btn_img = PhotoImage(file = assets_path + "/rounded_button.png")
 
   for index, item in enumerate(clipboard.history):
     # 47 = gap, 73 = added gap per item shown in GUI
@@ -273,6 +272,7 @@ def clipboardChangeListener():
     try:
       currentContent = pyperclip.paste()
       if currentContent != previousContent:
+        print(type(currentContent))
         previousContent = currentContent  # update previous content to match the current, since there has been a change
         clipboard.addToHistory(currentContent, False)
     except Exception as err:
