@@ -272,7 +272,6 @@ def clipboardChangeListener():
     try:
       currentContent = pyperclip.paste()
       if currentContent != previousContent:
-        print(type(currentContent))
         previousContent = currentContent  # update previous content to match the current, since there has been a change
         clipboard.addToHistory(currentContent, False)
     except Exception as err:

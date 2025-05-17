@@ -20,8 +20,13 @@ ClipHist is my attempt at a simple clipboard manager for Linux. Here's what it s
 
 ## Getting Started
 
-### Prerequisites
+### Installation
 
+If you simply want to install ClipHist, use the handy installer. Go to this repository's "releases" tab, and follow the instructions for the latest release.
+
+### Program Files Installation
+
+To install ClipHist using the program files, follow these instrucitons.
 ClipHist is built using Python and its os, pyautogui, pyperclip, threading, time, and tkinter libraries. Install the following:
 
 ```console
